@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+
+
+  </style>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet'>
+  <link rel='stylesheet' type='text/css' href='assets/css/style.css'>
+  <title>Visualizing Image Fields</title>
+  <meta name='author' content='Douglas Duhaime'>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="src/bootstrap-tagsinput.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+
+</head>
+
+<body>
+
+  <div id="tagSearch" autocomplete="off" style="display: none;">
+    <div id="autoComp" class="container">
+      <h1>Tags Input...</h1>
+      <div class="row">
+        <div class="col-sm-8">
+          <input type="text" data-role="tagsinput" />
+        </div>
+        <button class="btn btn-primary" onclick="loadDoc()" type="submit">
+          Search
+        </button>
+      </div>
+      <div class="row container">
+        <p id="totalNum">Number of result: 0</p>
+      </div>
+    </div>
+  </div>
+  <div class='loader-scene'>
+    <p class='welcome'>This page visualizes a large image collection within an interactive WebGL scene. Each image was processed with an <a href='https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf' target='_blank'>Inception</a> Convolutional Neural
+      Network, trained on <a href='http://image-net.org/challenges/LSVRC/2012/' target='_blank'>ImageNet 2012</a>, and projected into a two-dimensional manifold with the <a href='https://github.com/lmcinnes/umap' target='_blank'>UMAP</a> algorithm
+      such that similar images appear proximate to one another.</p>
+    <div class='loader-container'>
+      <div class='loader-icon'>
+        <div class='blocks'>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+          <div class='block'></div>
+        </div>
+      </div>
+      <div id='progress'>0%</div>
+    </div>
+    <div class='new'>
+    </div>
+    <button id='enter' class="center-block">Enter</button>
+  </div>
+
+
+
+  <nav>
+    <div class='nav-inner'>
+      <h2>Hotspots</h2>
+      <div id='hotspots'></div>
+      <script type='text/html' id='template'>
+        <% _.forEach(hotspots, function(hotspot) { %>
+            <div class='hotspot'>
+              <div class='background-image'
+                style='background-image: url("output/thumbs/128px/<%= hotspot.img %>")'></div>
+              <div><%= hotspot.label %></div>
+            </div>
+          <% }); %>
+        </script>
+    </div>
+  </nav>
+  <span id="newele"></span>
+
+  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/three.js/88/three.min.js'></script>
+  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js'></script>
+  <script src="d3.v4.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+  <script type='text/javascript' src='assets/js/object-assign-polyfill.js'></script>
+  <script type='text/javascript' src='assets/js/tween.js'></script>
+  <script type='text/javascript' src='assets/js/trackball-controls.js'></script>
+  <script type='text/javascript' src='assets/js/texture-loader.js'></script>
+  <script type='text/javascript' src='assets/js/filenames.js'></script>
+  <script type='text/javascript' src='assets/js/tsne-webgl.js'></script>
+  <script type='text/javascript' src='assets/js/ga.js'></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/rainbow.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/generic.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/html.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/javascript.js"></script>
+  <script src="src/bootstrap-tagsinput.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    var tagString = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      prefetch: {
+        url: '/assets/js/tags.json',
+        filter: function(list) {
+          return $.map(list, function(tag) {
+            return {
+              name: tag
+            };
+          });
+        }
+      }
+    });
+    tagString.initialize();
+
+    $('input').tagsinput({
+      typeaheadjs: {
+        name: 'tagString',
+        displayKey: 'name',
+        valueKey: 'name',
+        source: tagString.ttAdapter()
+      }
+    });
+
+  </script>
+</body>
+
+</html>
